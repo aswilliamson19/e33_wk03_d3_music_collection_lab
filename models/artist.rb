@@ -49,4 +49,41 @@ class Artist
     return albums
   end
 
+  def Artist.find(id)
+    db = PG.connect({dbname: 'music_collection', host: 'localhost'})
+    sql = "SELECT * FROM artists WHERE id = $1"
+    values = [id]
+    db.prepare("find", sql)
+    result = db.exec_prepared("find", values)
+    db.close()
+    artist = result.map { |artist_hash| Artist.new(artist_hash) }
+    return artist
+  end
+
+  def update()
+    db = PG.connect({dbname: 'music_collection', host: 'localhost'})
+    sql = "UPDATE artists SET name = $1 WHERE id = $2 RETURNING *"
+    values = [@name, @id]
+    db.prepare("update", sql)
+    db.exec_prepared("update", values)
+    db.close()
+  end
+
+  def Artist.delete_all()
+    db = PG.connect({dbname: 'music_collection', host: 'localhost'})
+    sql = "DELETE FROM artists"
+    db.prepare("delete_all", sql)
+    db.exec_prepared("delete_all")
+    db.close()
+  end
+
+  def delete()
+    db = PG.connect({dbname: 'music_collection', host: 'localhost'})
+    sql = "DELETE FROM artists WHERE id = $1"
+    values = [@id]
+    db.prepare("delete", sql)
+    db.exec_prepared("delete", values)
+    db.close()
+  end
+
 end
